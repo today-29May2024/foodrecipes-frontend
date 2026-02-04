@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
+import { devApi, prodApi } from '../api/axios';
 import './Recipe.css';
+
+let api = devApi;
+
+if (process.env.NODE_ENV === 'development') {
+  api = devApi;
+} 
+
+if (process.env.NODE_ENV === 'production')  {
+  api = prodApi;
+}
 
 const RecipeDetail = () => {
   const [recipe, setRecipe] = useState(null);
@@ -22,6 +32,7 @@ const RecipeDetail = () => {
       setRecipe(response.data);
     } catch (err) {
       setError('Failed to load recipe');
+      navigate('/recipes')
     } finally {
       setLoading(false);
     }

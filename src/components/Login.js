@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
+import { prodApi, devApi } from '../api/axios';
 import './Auth.css';
+
+let api = devApi;
+
+if (process.env.NODE_ENV === 'development') {
+  api = devApi;
+} 
+
+if (process.env.NODE_ENV === 'production')  {
+  api = prodApi;
+}
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +22,12 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { checkingAuth } = useAuth();
   const navigate = useNavigate();
+
+  if (checkingAuth === true) {
+    return <Navigate to='/recipes' />
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,7 +75,10 @@ const Login = () => {
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}
+            style={{ backgroundColor: process.env.NODE_ENV === 'development' ? '#66ccff': 
+                                                process.env.NODE_ENV === 'production' ? '#4CAF50' :
+                                                '#4CAF50'}}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>

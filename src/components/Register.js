@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios';
+import { prodApi, devApi } from '../api/axios';
 import './Auth.css';
+
+let api = devApi;
+
+if (process.env.NODE_ENV === 'development') {
+  api = devApi;
+} 
+
+if (process.env.NODE_ENV === 'production')  {
+  api = prodApi;
+}
 
 const Register = () => {
   const [formData, setFormData] = useState({

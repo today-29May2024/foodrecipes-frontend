@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
+import { prodApi, devApi } from '../api/axios';
 import './Recipe.css';
+
+let api = devApi;
+
+if (process.env.NODE_ENV === 'development') {
+  api = devApi;
+} 
+
+if (process.env.NODE_ENV === 'production')  {
+  api = prodApi;
+}
 
 const RecipeList = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { user } = useAuth();
+  const { user, checkingAuth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (checkingAuth) return;
     if (!user) {
       navigate('/login');
       return;
     }
     fetchRecipes();
-  }, [user, navigate]);
+  }, [user, checkingAuth, navigate]);
 
   const fetchRecipes = async () => {
     try {
@@ -48,7 +59,11 @@ const RecipeList = () => {
     <div className="recipe-list-container">
       <div className="recipe-list-header">
         <h2>All Recipes</h2>
-        <Link to="/recipes/new" className="btn-primary">Add New Recipe</Link>
+        <Link to="/recipes/new" className="btn-primary" 
+            style={{ backgroundColor: process.env.NODE_ENV === 'development' ? '#66ccff': 
+                                      process.env.NODE_ENV === 'production' ? '#4CAF50' :
+                                      '#4CAF50'}}>
+            Add New Recipe</Link>
       </div>
       
       {recipes.length === 0 ? (

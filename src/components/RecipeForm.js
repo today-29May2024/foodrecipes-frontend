@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
+import { prodApi, devApi } from '../api/axios';
 import './Recipe.css';
+
+let api = devApi;
+
+if (process.env.NODE_ENV === 'development') {
+  api = devApi;
+} 
+
+if (process.env.NODE_ENV === 'production')  {
+  api = prodApi;
+}
 
 const RecipeForm = () => {
   const [formData, setFormData] = useState({
@@ -16,12 +26,13 @@ const RecipeForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { user } = useAuth();
+  const { user, checkingAuth } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
 
   useEffect(() => {
+    if (checkingAuth) return;
     if (!user) {
       navigate('/login');
       return;
@@ -29,7 +40,7 @@ const RecipeForm = () => {
     if (isEdit) {
       fetchRecipe();
     }
-  }, [id, user, navigate]);
+  }, [id, user, checkingAuth, navigate]);
 
   const fetchRecipe = async () => {
     try {
@@ -170,7 +181,10 @@ const RecipeForm = () => {
           </div>
 
           <div className="form-actions">
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading} 
+                    style={{ backgroundColor: process.env.NODE_ENV === 'development' ? '#66ccff': 
+                                              process.env.NODE_ENV === 'production' ? '#4CAF50' :
+                                              '#4CAF50'}}>
               {loading ? 'Saving...' : (isEdit ? 'Update Recipe' : 'Create Recipe')}
             </button>
             <button type="button" onClick={() => navigate('/recipes')} className="btn-cancel">
