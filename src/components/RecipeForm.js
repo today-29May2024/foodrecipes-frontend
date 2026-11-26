@@ -118,6 +118,7 @@ const RecipeForm = () => {
               value={formData.description}
               onChange={handleChange}
               rows="3"
+              required
             />
           </div>
 
