@@ -81,7 +81,10 @@ const Register = () => {
               minLength="6"
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}
+            style={{ backgroundColor: process.env.NODE_ENV === 'development' ? '#66ccff': 
+                                                process.env.NODE_ENV === 'production' ? '#4CAF50' :
+                                                '#4CAF50'}}>
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
